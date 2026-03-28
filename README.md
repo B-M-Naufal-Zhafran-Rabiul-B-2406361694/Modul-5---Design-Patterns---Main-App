@@ -93,3 +93,16 @@ This is the place for you to write reflections:
 3. Ya, saya mengeksplor Postman dan tool ini sangat membantu untuk menguji endpoint tanpa membuat client manual. Untuk pekerjaan saat ini, Postman mempermudah set method/URL/header/body JSON, melihat status code dan response body dengan cepat, serta mengulang request subscribe/unsubscribe secara konsisten. Fitur yang menurut saya paling berguna untuk proyek kelompok dan proyek ke depan adalah Collection (menyimpan skenario endpoint), Environment Variables (ganti base URL/token tanpa ubah request satu per satu), Tests Script (assertion otomatis setelah request), dan Collection Runner (menjalankan rangkaian tes API secara berurutan).
 
 #### Reflection Publisher-3
+
+1. Pada tutorial ini, variasi Observer yang digunakan adalah **Push model**. Publisher (main app) langsung mengirim payload notifikasi ke subscriber melalui HTTP POST saat event terjadi (`CREATED`, `PROMOTION`, `DELETED`). Subscriber menerima data yang sudah disiapkan publisher (judul produk, tipe, URL produk, nama subscriber, status), bukan menarik data sendiri dari publisher.
+
+2. Jika kita membayangkan menggunakan variasi satunya (Pull model), ada beberapa trade-off:
+   - Kelebihan Pull: payload notifikasi awal bisa lebih ringan karena publisher cukup memberi sinyal/event sederhana; subscriber lebih fleksibel menentukan data apa yang ingin diambil dari publisher.
+   - Kekurangan Pull: subscriber harus melakukan request tambahan ke publisher setelah menerima sinyal, sehingga total latency end-to-end bisa bertambah. Beban request ke publisher juga naik karena ada extra "follow-up fetch" dari tiap subscriber. Implementasi juga jadi lebih kompleks karena perlu desain endpoint pengambilan data yang konsisten, kontrol versi data, dan kemungkinan race condition jika data berubah di antara momen event dan momen fetch.
+   - Untuk kasus tutorial ini, Push lebih cocok karena event notifikasi relatif sederhana dan datanya sudah jelas.
+
+3. Jika proses notifikasi tidak memakai multi-threading, pengiriman notifikasi ke subscriber akan berjalan berurutan (synchronous one-by-one). Dampaknya:
+   - Response endpoint utama (`create/publish/delete`) bisa menjadi lebih lambat karena harus menunggu semua request notifikasi selesai.
+   - Satu subscriber yang lambat/tidak responsif dapat menahan seluruh alur, sehingga throughput aplikasi menurun.
+   - Pengalaman pengguna memburuk pada beban tinggi karena request bisnis inti ikut terblokir oleh proses notifikasi.
+   Multi-threading membantu memisahkan bottleneck I/O notifikasi dari alur utama, sehingga aplikasi tetap lebih responsif.
