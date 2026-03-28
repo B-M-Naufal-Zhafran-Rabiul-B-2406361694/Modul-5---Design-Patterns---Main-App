@@ -1,5 +1,5 @@
 use rocket::serde::{Deserialize, Serialize};
-use rocket::log;
+use log;
 use rocket::serde::json::to_string;
 use rocket::tokio;
 use bambangshop::REQUEST_CLIENT;
