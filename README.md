@@ -86,4 +86,10 @@ This is the place for you to write reflections:
 
 #### Reflection Publisher-2
 
+1. Walaupun dalam konsep MVC klasik "Model" bisa mencakup data dan logic, pada praktik aplikasi yang mulai berkembang pemisahan `Model`, `Service`, dan `Repository` membantu menjaga desain tetap bersih. `Model` sebaiknya fokus pada representasi data/domain, `Repository` fokus pada akses dan penyimpanan data, sedangkan `Service` fokus pada aturan bisnis dan orkestrasi alur use case. Pemisahan ini mengikuti prinsip Single Responsibility dan Separation of Concerns, sehingga kode lebih mudah diuji, diubah, dan dikembangkan tanpa efek samping yang luas.
+
+2. Jika semua hal dipaksa masuk ke `Model` saja, maka setiap model akan cepat menjadi "god object". Interaksi antar model (`Program`, `Subscriber`, `Notification`) akan saling menempel kuat: satu model harus tahu detail storage, validasi, sekaligus alur notifikasi model lain. Akibatnya kompleksitas naik, dependensi melingkar lebih mudah muncul, testing unit jadi sulit (karena harus menyiapkan banyak konteks sekaligus), dan perubahan kecil pada satu alur berpotensi merusak banyak bagian lain.
+
+3. Ya, saya mengeksplor Postman dan tool ini sangat membantu untuk menguji endpoint tanpa membuat client manual. Untuk pekerjaan saat ini, Postman mempermudah set method/URL/header/body JSON, melihat status code dan response body dengan cepat, serta mengulang request subscribe/unsubscribe secara konsisten. Fitur yang menurut saya paling berguna untuk proyek kelompok dan proyek ke depan adalah Collection (menyimpan skenario endpoint), Environment Variables (ganti base URL/token tanpa ubah request satu per satu), Tests Script (assertion otomatis setelah request), dan Collection Runner (menjalankan rangkaian tes API secara berurutan).
+
 #### Reflection Publisher-3
