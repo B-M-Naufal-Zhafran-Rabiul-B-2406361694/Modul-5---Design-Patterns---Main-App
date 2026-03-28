@@ -78,6 +78,12 @@ This is the place for you to write reflections:
 
 #### Reflection Publisher-1
 
+1. Pada kasus BambangShop ini, satu `struct Subscriber` sudah cukup untuk saat ini karena semua subscriber masih punya perilaku yang sama: menerima notifikasi via HTTP dengan pola payload yang sama. Dalam istilah Observer, relasi Subject-Observer tetap diterapkan, tetapi belum butuh banyak implementasi observer dengan logika `update` yang berbeda. `trait` baru menjadi penting jika nanti ada kebutuhan perilaku subscriber yang polymorphic, misalnya sebagian lewat HTTP, sebagian lewat message queue, atau punya strategi retry/fallback yang berbeda.
+
+2. Karena `id`/`url` dimaksudkan unik, penyimpanan berbasis map lebih tepat daripada `Vec`. Jika memakai `Vec`, pengecekan keunikan harus dilakukan manual dengan scan list dulu (`O(n)`), dan operasi hapus juga linear. Dengan `DashMap<String, Subscriber>`, keunikan direpresentasikan langsung lewat key, operasi lookup/hapus mendekati `O(1)`, dan maksud desain tentang identitas unik jadi lebih jelas di struktur datanya.
+
+3. Singleton dan thread-safe map menyelesaikan masalah yang berbeda, jadi keduanya saling melengkapi, bukan saling menggantikan. Singleton menjawab "berapa instance global yang dipakai" (satu penyimpanan subscriber bersama), sedangkan `DashMap` menjawab "apakah baca/tulis paralel aman tanpa data race." Pada web server yang menangani banyak request secara bersamaan, kita tetap butuh sinkronisasi internal yang thread-safe. Jadi desain yang tepat adalah singleton yang membungkus struktur concurrent (misalnya `DashMap` atau `RwLock<HashMap<...>>`); singleton saja tidak cukup untuk menjamin thread safety.
+
 #### Reflection Publisher-2
 
 #### Reflection Publisher-3
