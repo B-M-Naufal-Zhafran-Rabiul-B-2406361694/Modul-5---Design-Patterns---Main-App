@@ -13,6 +13,8 @@ lazy_static! {
     pub static ref APP_CONFIG: AppConfig = AppConfig::generate();
 }
 
+pub use REQWEST_CLIENT as REQUEST_CLIENT;
+
 #[derive(Debug, Deserialize, Serialize, Getters)]
 #[serde(crate = "rocket::serde")]
 pub struct AppConfig {
